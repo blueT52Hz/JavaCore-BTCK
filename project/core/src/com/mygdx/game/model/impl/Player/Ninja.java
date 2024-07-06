@@ -1,5 +1,4 @@
 package com.mygdx.game.model.impl.Player;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -9,11 +8,12 @@ import com.mygdx.game.controller.BoxManager;
 import com.mygdx.game.model.Player;
 import com.mygdx.game.model.PlayerBullet;
 import com.mygdx.game.model.StatusSkinAndArm;
-import com.mygdx.game.model.constant.ArmState;
 import com.mygdx.game.model.constant.PlayerState;
-import com.mygdx.game.model.constant.SkinState;
 import com.mygdx.game.model.impl.Bullet.Kunai;
 import com.mygdx.game.view.GameMap;
+
+import java.util.Objects;
+
 import static com.mygdx.game.model.constant.Constants.PPM;
 
 public class Ninja extends Player {
@@ -40,8 +40,6 @@ public class Ninja extends Player {
         this.appear = true;
         this.kunai = new Kunai(x, y);
         this.playerState = PlayerState.IDLE;
-        this.skinState = SkinState.NINJA;
-        this.armState = ArmState.KUNAI;
         this.navigationArrow = new Sprite(new Texture("Arrow2.png"));
         createBody();
         loadTextures();
@@ -68,47 +66,15 @@ public class Ninja extends Player {
     }
 
     public void changeSkin(int index) {
-        if (index == 0)
-            StatusSkinAndArm.skinState = SkinState.NINJA;
-        else if (index == 1)
-            StatusSkinAndArm.skinState = SkinState.NINJAGRIRL;
-        System.out.println(skinState.getDisplayName());
         loadAnimation();
+        System.out.println("Change");
     }
 
     public void changeArm(int index) {
         kunai.setTexture(arms[index]);
-        switch (index) {
-            case 0:
-                StatusSkinAndArm.armState = ArmState.KUNAI;
-                break;
-            case 1:
-                StatusSkinAndArm.armState = ArmState.BOMB;
-                break;
-            case 2:
-                StatusSkinAndArm.armState = ArmState.BOMERANG;
-                break;
-            case 3:
-                StatusSkinAndArm.armState = ArmState.DART;
-                break;
-            case 4:
-                StatusSkinAndArm.armState = ArmState.FOLLDINGFAN;
-                break;
-            case 5:
-                StatusSkinAndArm.armState = ArmState.HAMMER;
-                break;
-            case 6:
-                StatusSkinAndArm.armState = ArmState.SHURIKEN;
-                break;
-            case 7:
-                StatusSkinAndArm.armState = ArmState.SHIELD;
-                break;
-            case 8:
-                StatusSkinAndArm.armState = ArmState.RUGBY;
-                break;
-            default:
-                break;
-        }
+        if (!Objects.equals(StatusSkinAndArm.armState, "Kunai")){
+            kunai.setHeight(40);
+        }else kunai.setHeight(8);
     }
 
     public void draw(SpriteBatch spriteBatch, float gameMapStateTime) {
@@ -116,10 +82,10 @@ public class Ninja extends Player {
         update();
         switch (playerState) {
             case IDLE:
-                spriteBatch.draw(waitImg, x - width / 2, y - height / 2, width, height);
+                spriteBatch.draw(waitImg, x - (float) width / 2, y - (float) height / 2, width, height);
                 break;
             case GLIDE:
-                spriteBatch.draw((Texture) glideAnimation.getKeyFrame(gameMapStateTime, true), x - width / 2, y - height / 2, width, height);
+                spriteBatch.draw((Texture) glideAnimation.getKeyFrame(gameMapStateTime, true), x - (float) width / 2, y - (float) height / 2, width, height);
                 break;
             case THROW:
                 Texture throwImg = (Texture) throwAnimation.getKeyFrame(stateTime, false);
@@ -129,7 +95,7 @@ public class Ninja extends Player {
                     playerState = PlayerState.GLIDE;
                     throwed = true;
                 }
-                spriteBatch.draw(throwImg, x - width / 2, y - height / 2, width, height);
+                spriteBatch.draw(throwImg, x - (float) width / 2, y - (float) height / 2, width, height);
                 break;
             case FLASH:
                 Texture tmp = (Texture) flashAnimation.getKeyFrame(stateTime, true);
@@ -139,7 +105,7 @@ public class Ninja extends Player {
                     playerState = PlayerState.GLIDE;
                     tmp = waitImg;
                 }
-                spriteBatch.draw(tmp, x - width / 2, y - height / 2, width, height);
+                spriteBatch.draw(tmp, x - (float) width / 2, y - (float) height / 2, width, height);
                 break;
             case DEAD:
                 break;
@@ -163,11 +129,11 @@ public class Ninja extends Player {
         Texture[] glideImg = new Texture[9];
         Texture[] flashImg = new Texture[14];
         for(int i=0;i<9;++i) {
-            throwImg[i] = new Texture("Entities/" + StatusSkinAndArm.skinState.getDisplayName() + "/" + String.format("Throw__00%d.png", i));
-            glideImg[i] = new Texture("Entities/" + StatusSkinAndArm.skinState.getDisplayName() + "/" +String.format("Glide_00%d.png", i));
-            flashImg[i] = new Texture("Entities/" + StatusSkinAndArm.skinState.getDisplayName() + "/" +String.format("Lightning_%02d.png", i + 1));
+            throwImg[i] = new Texture("Entities/" + StatusSkinAndArm.skinState + "/" + String.format("Throw__00%d.png", i));
+            glideImg[i] = new Texture("Entities/" + StatusSkinAndArm.skinState + "/" +String.format("Glide_00%d.png", i));
+            flashImg[i] = new Texture("Entities/" + StatusSkinAndArm.skinState + "/" +String.format("Lightning_%02d.png", i + 1));
         }
-        for (int i = 10;  i<= 13; i++) flashImg[i] = new Texture("Entities/" + skinState.getDisplayName() + "/" + String.format("Lightning_%02d.png", i+1));
+        for (int i = 10;  i<= 13; i++) flashImg[i] = new Texture("Entities/" + StatusSkinAndArm.skinState + "/" + String.format("Lightning_%02d.png", i+1));
         throwAnimation = new Animation<>(0.075f, throwImg);
         glideAnimation = new Animation<>(0.1f, glideImg);
         flashAnimation = new Animation<>(0.025f, flashImg);

@@ -10,28 +10,19 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.controller.BoxManager;
 import com.mygdx.game.controller.CoinCounter;
 import com.mygdx.game.controller.CustomContactListener;
 import com.mygdx.game.controller.MouseHandler;
-import com.mygdx.game.model.Coin;
 import com.mygdx.game.model.constant.PlayerState;
 import com.mygdx.game.model.impl.Player.Ninja;
-
-import java.util.ArrayList;
-
 import static com.mygdx.game.model.constant.Constants.PPM;
 
 public class MainGameScreenTest implements Screen {
-    private final float SCALE  = 2.0f;
     private Box2DDebugRenderer b2dr;
     private OrthographicCamera camera;
     MyGdxGame game;
@@ -39,25 +30,24 @@ public class MainGameScreenTest implements Screen {
     MouseHandler mouseHandler;
     public static Ninja ninja;
     CustomContactListener contactListener;
-    private BitmapFont lvFont, completeFont, taptocontinueFont, nameFont, coinFont, scoreFont;
-    private FreeTypeFontGenerator fontGenerator;
+    private BitmapFont lvFont, completeFont, continuanceFont, nameFont, coinFont, scoreFont;
+    private final FreeTypeFontGenerator fontGenerator;
     private Texture tableTexture;
     private Texture coinTexture;
     private GlyphLayout layout;
     private boolean levelComplete;
-    private FreeTypeFontGenerator.FreeTypeFontParameter parameter;
-    private String playerName;
+    private final String playerName;
     private Body platform;
     public MainGameScreenTest(MyGdxGame game, String playerName) {
         this.game = game;
         this.playerName = playerName;
-        this.gameMap = MainMenuScreen.gameMap;
         this.fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("MinecraftRegular-Bmg3.otf"));
     }
 
     @Override
     public void show () {
-        ninja = gameMap.getLevelManager().player;
+        gameMap = new GameMap();
+        ninja = MyGdxGame.ninja;
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
@@ -72,23 +62,23 @@ public class MainGameScreenTest implements Screen {
         gameMap.bottomWall.getFixtureList().first().setUserData("bottomWall");
         gameMap.topWall = BoxManager.createBox(200, 720+16, 400, 32, true, GameMap.world, 0);
         gameMap.topWall.getFixtureList().first().setUserData("topWall");
-        gameMap.leftWall = BoxManager.createBox(8, 720/2, 16, 720, true, GameMap.world, 0);
+        gameMap.leftWall = BoxManager.createBox(8, (float) 720 /2, 16, 720, true, GameMap.world, 0);
         gameMap.leftWall.getFixtureList().first().setUserData("wall");
-        gameMap.rightWall = BoxManager.createBox(400-8, 720/2, 16, 720, true, GameMap.world, 0);
+        gameMap.rightWall = BoxManager.createBox(400-8, (float) 720 /2, 16, 720, true, GameMap.world, 0);
         gameMap.rightWall.getFixtureList().first().setUserData("wall");
 
         mouseHandler = new MouseHandler();
         Gdx.input.setInputProcessor(mouseHandler);
 
         layout = new GlyphLayout();
-        parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size = 50;
         parameter.color = Color.RED;
         completeFont = fontGenerator.generateFont(parameter);
 
         parameter.size = 20;
         parameter.color = Color.WHITE;
-        taptocontinueFont = fontGenerator.generateFont(parameter);
+        continuanceFont = fontGenerator.generateFont(parameter);
 
         parameter.size = 50;
         parameter.color = Color.WHITE;
@@ -151,7 +141,7 @@ public class MainGameScreenTest implements Screen {
         String coinCount = String.valueOf(CoinCounter.getCoinIngame());
         coinFont.draw(game.batch, coinCount, 50, Gdx.graphics.getHeight() - 40);
 
-        scoreFont.draw(game.batch, "Score: " + Integer.toString(gameMap.playerScore.getScore()), Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 10);
+        scoreFont.draw(game.batch, "Score: " + Integer.toString(GameMap.playerScore.getScore()), Gdx.graphics.getWidth() - 100, Gdx.graphics.getHeight() - 10);
         // end vẽ UI
 
         ninja.kunai.update();
@@ -200,7 +190,7 @@ public class MainGameScreenTest implements Screen {
             GameMap.playerScore.saveScore(playerName);
             CoinCounter.updateCoin(CoinCounter.getCoinIngame());
             CoinCounter.resetCoinIngame();
-            game.batch.draw(tableTexture, MyGdxGame.WIDTH / 2 - 180, 200, 360, 300);
+            game.batch.draw(tableTexture, (float) MyGdxGame.WIDTH / 2 - 180, 200, 360, 300);
 
             String completeText = "YOU LOSE";
             layout.setText(completeFont, completeText);
@@ -211,15 +201,12 @@ public class MainGameScreenTest implements Screen {
             completeFont.draw(game.batch, completeText, completeTextX, completeTextY);
 
             String continueText = "Tap to continue";
-            layout.setText(taptocontinueFont, continueText);
+            layout.setText(continuanceFont, continueText);
             float continueTextWidth = layout.width;
             float continueTextHeight = layout.height;
             float continueTextX = (Gdx.graphics.getWidth() - continueTextWidth) / 2;
             float continueTextY = (Gdx.graphics.getHeight() - continueTextHeight) / 2 - 30;
-            taptocontinueFont.draw(game.batch, continueText, continueTextX, continueTextY);
-
-            if(Gdx.input.justTouched()) {
-            }
+            continuanceFont.draw(game.batch, continueText, continueTextX, continueTextY);
         }
 
         game.batch.end();
@@ -258,8 +245,8 @@ public class MainGameScreenTest implements Screen {
     }
     public void cameraUpdate(float delta) {
         Vector3 position = camera.position;
-        position.x = Gdx.graphics.getWidth()/2;
-        position.y = Gdx.graphics.getHeight()/2;
+        position.x = (float) Gdx.graphics.getWidth() /2;
+        position.y = (float) Gdx.graphics.getHeight() /2;
         camera.position.set(position);
         camera.update();
     }

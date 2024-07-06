@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.model.StatusSkinAndArm;
 import com.mygdx.game.model.impl.Player.Ninja;
 import com.mygdx.game.model.impl.Player.Skin;
 import com.mygdx.game.controller.CoinCounter;
@@ -27,8 +28,6 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static com.mygdx.game.view.MainMenuScreen.gameMap;
-
 public class StoreSkinsScreen extends BaseScreen {
     private final MyGdxGame game;
     private final Texture coinTexture;
@@ -37,16 +36,13 @@ public class StoreSkinsScreen extends BaseScreen {
     private final Texture armsTexture;
     private final Texture usingTexture;
     private ArrayList<Skin> skins = new ArrayList<Skin>();
-
-    private Ninja player;
     private BitmapFont coinFont;
     private FreeTypeFontGenerator.FreeTypeFontParameter parameter;
     private FreeTypeFontGenerator fontGenerator;
 
-    public StoreSkinsScreen(MyGdxGame game, Ninja player) {
+    public StoreSkinsScreen(MyGdxGame game) {
         super(game);
         this.game = game;
-        this.player = player;
         coinTexture = new Texture(Gdx.files.internal("Coin/Coin(5).png"));
         ninjaTexture = new Texture(Gdx.files.internal("Entities/ninja/Throw__009.png"));
         ninjaGirlTexture = new Texture(Gdx.files.internal("Entities/ninjagirl/Throw__009.png"));
@@ -64,11 +60,10 @@ public class StoreSkinsScreen extends BaseScreen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
-
         loadSkinsFromJSON("Skins.json");
     }
 
-    private void handleskinButtonClick(int index) {
+    private void handleSkinButtonClick(int index) {
         // Xử lý logic khi click vào button skin
         Skin skin = skins.get(index);
         if (CoinCounter.getCoinIngame() >= skin.getPrice() && !skin.isUnlocked()) {
@@ -80,7 +75,8 @@ public class StoreSkinsScreen extends BaseScreen {
             s.setEquipped(false);
         }
         skin.setEquipped(true);
-        gameMap.getLevelManager().player.changeSkin(index);
+        StatusSkinAndArm.skinState = skin.getName();
+        MyGdxGame.ninja.changeSkin(index);
     }
 
     private void loadSkinsFromJSON(String filename) {
@@ -167,7 +163,7 @@ public class StoreSkinsScreen extends BaseScreen {
         armsButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new StoreArmsScreen(game, player));
+                game.setScreen(new StoreArmsScreen(game));
                 return true;
             }
         });
@@ -184,7 +180,7 @@ public class StoreSkinsScreen extends BaseScreen {
             skinButton.addListener(new InputListener() {
                 @Override
                 public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    handleskinButtonClick(index);
+                    handleSkinButtonClick(index);
                     return true;
                 }
             });
@@ -203,7 +199,9 @@ public class StoreSkinsScreen extends BaseScreen {
                 Image lockImage = new Image(lockTexture);
                 lockImage.setSize(20, 20);
                 lockImage.setPosition(50, 50);
-                skinButton.addActor(lockImage);
+                Table lockTable = new Table();
+                lockTable.add(lockImage).size(10, 10).top().right().padTop(-5).padRight(-5);
+                skinButton.addActor(lockTable);
             }
 
             // Thêm hình ảnh đang sử dụng nếu skin đã được chọn
@@ -215,23 +213,18 @@ public class StoreSkinsScreen extends BaseScreen {
             }
         }
         game.batch.end();
-
         stage.act(delta);
         stage.draw();
     }
 
     @Override
-    public void resize(int width, int height) {
-        stage.getViewport().update(width, height, true);
-    }
-
-    @Override
     public void dispose() {
-        // Giải phóng tài nguyên khi không cần thiết nữa
         stage.dispose();
         coinTexture.dispose();
         ninjaTexture.dispose();
         armsTexture.dispose();
-        fontGenerator.dispose(); // Important: dispose font generator
+        fontGenerator.dispose();
+        ninjaGirlTexture.dispose();
+        usingTexture.dispose();
     }
 }
