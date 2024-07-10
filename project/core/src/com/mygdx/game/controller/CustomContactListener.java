@@ -1,21 +1,34 @@
 package com.mygdx.game.controller;
 
-import com.badlogic.gdx.math.MathUtils;
+
 import com.badlogic.gdx.physics.box2d.*;
 import com.mygdx.game.model.*;
+import com.mygdx.game.model.constant.ConstantSound;
 import com.mygdx.game.model.constant.EnemyState;
 import com.mygdx.game.model.constant.PlayerState;
-import com.mygdx.game.model.impl.Bullet.Flame;
-import com.mygdx.game.model.impl.Bullet.Kunai;
-import com.mygdx.game.model.impl.Player.Ninja;
 import com.mygdx.game.view.Brick;
 import com.mygdx.game.view.GameMap;
+import com.badlogic.gdx.audio.Sound;
+
 
 public class CustomContactListener implements ContactListener {
     private GameMap gameMap;
 
+    private AudioManager audioManager;
+    private Sound   kunaiHitWallSound,
+            coinEarnedSound,
+            enemyDeadSound,
+            fireballShootSound,
+            fireballHitWallSound;
+    // Âm thanh va chạm
     public CustomContactListener(GameMap gameMap) {
         this.gameMap = gameMap;
+        this.audioManager = AudioManager.getInstance();
+        this.kunaiHitWallSound = ConstantSound.kunaiHitWallSound; // Khởi tạo âm thanh từ ConstantSound
+        this.coinEarnedSound = ConstantSound.coinEarnedSound;
+        this.enemyDeadSound = ConstantSound.enemyDeadSound;
+        this.fireballShootSound = ConstantSound.fireballShootSound;
+        this.fireballHitWallSound = ConstantSound.fireballHitWallSound;
     }
 
     // Xử lý khi bắt đầu va chạm
@@ -27,13 +40,18 @@ public class CustomContactListener implements ContactListener {
         if(fixtureA.getUserData() == null || fixtureB.getUserData() == null) return;
 
         // xử lí khi EnemyBullet đập vào cạnh
-        if(     (fixtureA.getUserData() instanceof EnemyBullet && fixtureB.getUserData() == "wall") || (fixtureB.getUserData() instanceof EnemyBullet && fixtureA.getUserData() == "wall") ||
-                (fixtureA.getUserData() instanceof EnemyBullet && fixtureB.getUserData() == "topWall") || (fixtureB.getUserData() instanceof EnemyBullet && fixtureA.getUserData() == "topWall") ||
-                (fixtureA.getUserData() instanceof EnemyBullet && fixtureB.getUserData() == "bottomWall") || (fixtureB.getUserData() instanceof EnemyBullet && fixtureA.getUserData() == "bottomWall")) {
+        if( (fixtureA.getUserData() instanceof EnemyBullet && fixtureB.getUserData() == "wall") ||
+                (fixtureB.getUserData() instanceof EnemyBullet && fixtureA.getUserData() == "wall") ||
+                (fixtureA.getUserData() instanceof EnemyBullet && fixtureB.getUserData() == "topWall") ||
+                (fixtureB.getUserData() instanceof EnemyBullet && fixtureA.getUserData() == "topWall") ||
+                (fixtureA.getUserData() instanceof EnemyBullet && fixtureB.getUserData() == "bottomWall") ||
+                (fixtureB.getUserData() instanceof EnemyBullet && fixtureA.getUserData() == "bottomWall")) {
+
             EnemyBullet enemyBullet = (fixtureA.getUserData() instanceof Bullet) ? (EnemyBullet) fixtureA.getUserData() : (EnemyBullet) fixtureB.getUserData();
             // nếu là đạn của quái và không thể bật tường thì bỏ nó ra khỏi list đạn của quái
             if(!enemyBullet.isCanBounce()) {
                 enemyBullet.setAppear(false);
+                audioManager.playSound(fireballHitWallSound);
             }
             String s = (fixtureA.getUserData() instanceof Bullet) ? (String) fixtureB.getUserData() : (String) fixtureA.getUserData();
             if(s=="topWall" || s=="bottomWall") enemyBullet.setRotation(360-enemyBullet.getRotation());
@@ -52,6 +70,8 @@ public class CustomContactListener implements ContactListener {
                 else {
                     playerBullet.setRotation(360-playerBullet.getRotation());
                     playerBullet.setHandledContact(false);
+                    audioManager.playSound(kunaiHitWallSound);
+
                 }
             } else if(s=="bottomWall") {
                 if(gameMap.getLevelManager().enemies.get(gameMap.getLevelManager().getCurrentLevel()).isEmpty() && gameMap.getLevelManager().getCurrentLevel() != 0) {
@@ -59,10 +79,14 @@ public class CustomContactListener implements ContactListener {
                 } else {
                     playerBullet.setRotation(360-playerBullet.getRotation());
                     playerBullet.setHandledContact(false);
+                    audioManager.playSound(kunaiHitWallSound);
+
                 }
             } else {
                 playerBullet.setRotation(180-playerBullet.getRotation());
                 playerBullet.setHandledContact(false);
+                audioManager.playSound(kunaiHitWallSound);
+
             }
         }
 
@@ -71,14 +95,17 @@ public class CustomContactListener implements ContactListener {
             PlayerBullet playerBullet = (fixtureA.getUserData() instanceof PlayerBullet) ? (PlayerBullet) fixtureA.getUserData() : (PlayerBullet) fixtureB.getUserData();
             playerBullet.setRotation(360 - playerBullet.getRotation());
             playerBullet.setHandledContact(false);
+            audioManager.playSound(kunaiHitWallSound);
+
         }
 
-        // xử lí khi player trúng enemyBullet
+        // xử lí khi player trúng enemyBullet ==> gameover
         if((fixtureA.getUserData() instanceof EnemyBullet && fixtureB.getUserData() instanceof Player || fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof EnemyBullet)) {
-//            System.out.println("Nhân vật trúng đạn");
+            System.out.println("Nhân vật trúng đạn");
             EnemyBullet bullet = (fixtureA.getUserData() instanceof EnemyBullet) ? (EnemyBullet) fixtureA.getUserData() : (EnemyBullet) fixtureB.getUserData();
             Player player = (fixtureA.getUserData() instanceof EnemyBullet) ? (Player) fixtureB.getUserData() : (Player) fixtureA.getUserData();
-            player.setPlayerState(PlayerState.DEAD);
+            if (player.getPlayerState() == PlayerState.IDLE || player.getPlayerState() == PlayerState.GLIDE || player.getPlayerState() == PlayerState.THROW)
+                player.setPlayerState(PlayerState.DEAD);
             if(bullet instanceof EnemyBullet && !bullet.isCanBounce()) {
                 bullet.setAppear(false);
 //                System.out.println("Remove EnemyBullet");
@@ -90,6 +117,8 @@ public class CustomContactListener implements ContactListener {
         if((fixtureA.getUserData() instanceof PlayerBullet && fixtureB.getUserData() instanceof EnemyBullet || fixtureA.getUserData() instanceof EnemyBullet && fixtureB.getUserData() instanceof PlayerBullet)) {
             EnemyBullet enemyBullet = (fixtureA.getUserData() instanceof EnemyBullet) ? (EnemyBullet) fixtureA.getUserData() : (EnemyBullet) fixtureB.getUserData();
             enemyBullet.setAppear(false);
+            audioManager.playSound(fireballHitWallSound);
+            audioManager.playSound(kunaiHitWallSound);
         }
 
 
@@ -112,14 +141,17 @@ public class CustomContactListener implements ContactListener {
                         break;
                 }
             }
+            audioManager.playSound(kunaiHitWallSound);
+            audioManager.playSound(enemyDeadSound);
         }
 
         if( fixtureA.getUserData() instanceof Coin && fixtureB.getUserData() instanceof PlayerBullet || fixtureA.getUserData() instanceof PlayerBullet && fixtureB.getUserData() instanceof Coin ||
-            fixtureA.getUserData() instanceof Coin && fixtureB.getUserData() instanceof Player       || fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof Coin) {
+                fixtureA.getUserData() instanceof Coin && fixtureB.getUserData() instanceof Player       || fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof Coin) {
 
             Coin coin = (fixtureA.getUserData() instanceof Coin) ? (Coin) fixtureA.getUserData() : (Coin) fixtureB.getUserData();
             CoinCounter.addCoinIngame(coin.getValue());
             coin.setAppear(false);
+            audioManager.playSound(coinEarnedSound);
         }
 
     }
@@ -135,8 +167,6 @@ public class CustomContactListener implements ContactListener {
             Player player = (fixtureA.getUserData() instanceof Player) ? (Player) fixtureA.getUserData() : (Player) fixtureB.getUserData();
             player.setPlayerState(PlayerState.GLIDE);
         }
-
-
     }
 
     @Override
@@ -155,7 +185,6 @@ public class CustomContactListener implements ContactListener {
             contact.setEnabled(false);
         }
 
-
         if (    (fixtureA.getUserData() instanceof Player && fixtureB.getUserData() instanceof PlayerBullet) || (fixtureA.getUserData() instanceof PlayerBullet && fixtureB.getUserData() instanceof Player)||
                 (fixtureA.getUserData() instanceof Enemy && fixtureB.getUserData() instanceof EnemyBullet)   || (fixtureA.getUserData() instanceof EnemyBullet && fixtureB.getUserData() instanceof Enemy)  ||
                 (fixtureA.getUserData() instanceof EnemyBullet && fixtureB.getUserData() instanceof EnemyBullet)   ||
@@ -163,7 +192,6 @@ public class CustomContactListener implements ContactListener {
             // Vô hiệu hóa va chạm đạn đồng minh
             contact.setEnabled(false);
         }
-
 
         if((fixtureA.getUserData() instanceof PlayerBullet && fixtureB.getUserData() instanceof Enemy || fixtureA.getUserData() instanceof Enemy && fixtureB.getUserData() instanceof PlayerBullet)) {
             contact.setEnabled(false);
@@ -180,6 +208,4 @@ public class CustomContactListener implements ContactListener {
     public void postSolve(Contact contact, ContactImpulse contactImpulse) {
 
     }
-
 }
-

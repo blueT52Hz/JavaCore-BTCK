@@ -1,20 +1,11 @@
 package com.mygdx.game.model;
-
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.mygdx.game.model.constant.ArmState;
 import com.mygdx.game.model.constant.PlayerState;
-import com.mygdx.game.model.constant.SkinState;
-
-import static com.mygdx.game.model.constant.Constants.PPM;
 
 public abstract class Player extends Entity {
     protected float xSpeed;
     protected float ySpeed;
     protected PlayerState playerState;
-    protected SkinState skinState;
-    protected ArmState armState;
     protected boolean appear;
     protected PlayerBullet playerBullet;
     public Sprite navigationArrow;
@@ -51,20 +42,6 @@ public abstract class Player extends Entity {
         this.appear = appear;
     }
 
-    public SkinState getSkinState() {
-        return skinState;
-    }
-
-    public void setSkinState(SkinState skinState) {
-        this.skinState = skinState;
-    }
-    public ArmState getArmState() {
-        return armState;
-    }
-
-    public void setArmState(ArmState armState) {
-        this.armState = armState;
-    }
     @Override
     public void createBody(){
         super.createBody();

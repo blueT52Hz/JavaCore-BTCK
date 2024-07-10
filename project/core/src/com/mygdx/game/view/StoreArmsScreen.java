@@ -16,6 +16,7 @@ import com.google.gson.reflect.TypeToken;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.controller.CoinCounter;
 import com.mygdx.game.model.PlayerInventory;
+import com.mygdx.game.model.StatusSkinAndArm;
 import com.mygdx.game.model.impl.Bullet.Weapon;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.mygdx.game.model.impl.Player.Ninja;
@@ -27,8 +28,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import static com.mygdx.game.view.MainMenuScreen.gameMap;
 
 public class StoreArmsScreen extends BaseScreen {
     private final MyGdxGame game;
@@ -51,10 +50,9 @@ public class StoreArmsScreen extends BaseScreen {
     private FreeTypeFontGenerator.FreeTypeFontParameter parameter;
     private FreeTypeFontGenerator fontGenerator;
 
-    public StoreArmsScreen(MyGdxGame game, Ninja player) {
+    public StoreArmsScreen(MyGdxGame game) {
         super(game);
         this.game = game;
-        this.player = player;
         coinTexture = new Texture(Gdx.files.internal("Coin/Coin(5).png"));
         kunaiTexture = new Texture(Gdx.files.internal("Bullet/Kunai.png"));
         bombTexture = new Texture(Gdx.files.internal("Bullet/Bomb.png"));
@@ -79,24 +77,22 @@ public class StoreArmsScreen extends BaseScreen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
-
         loadWeaponsFromJSON("Weapons.json");
-
     }
 
     private void handleWeaponButtonClick(int index) {
-        // Handle button click logic here, such as buying or equipping the weapon
         Weapon weapon = weapons.get(index);
         if (CoinCounter.getCoinIngame() >= weapon.getPrice() && !weapon.isUnlocked()) {
-            CoinCounter.updateCoin(-weapon.getPrice()); // Subtract coins
-            weapon.setUnlocked(true); // Mark weapon as unlocked
-            PlayerInventory.addItem(weapon.getName()); // Add weapon to inventory
+            CoinCounter.updateCoin(-weapon.getPrice());
+            weapon.setUnlocked(true);
+            PlayerInventory.addItem(weapon.getName());
         }
         for (Weapon w : weapons) {
             w.setEquipped(false);
         }
         weapon.setEquipped(true);
-        gameMap.getLevelManager().player.changeArm(index);
+        StatusSkinAndArm.armState = weapon.getName();
+        MyGdxGame.ninja.changeArm(index);
     }
 
     private void loadWeaponsFromJSON(String filename) {
@@ -178,7 +174,7 @@ public class StoreArmsScreen extends BaseScreen {
         skinsButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                game.setScreen(new StoreSkinsScreen(game, player));
+                game.setScreen(new StoreSkinsScreen(game));
                 return true;
             }
         });

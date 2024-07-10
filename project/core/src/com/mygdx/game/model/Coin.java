@@ -12,7 +12,7 @@ public class Coin {
     private Body body;
     private float x, y;
     private int value;
-    private int size;
+    private final int size;
     private boolean appear;
     public Coin(float x, float y, int level) {
         this.x = x;
@@ -26,7 +26,7 @@ public class Coin {
     public void draw(SpriteBatch spriteBatch, float gameMapStateTime) {
         Texture tmp ;
         tmp = (Texture) spinning.getKeyFrame(gameMapStateTime, true);
-        spriteBatch.draw(tmp, x, y+size/2, size, size);
+        spriteBatch.draw(tmp, x, y+ (float) size /2, size, size);
     }
 
     public void load() {
@@ -61,7 +61,7 @@ public class Coin {
 
     public void createBody() {
 
-        this.body = BoxManager.createBox(x+size/2, y+size, size-20, size-20, true, GameMap.world, 0);
+        this.body = BoxManager.createBox(x+ (float) size /2, y+size, size-20, size-20, true, GameMap.world, 0);
         this.body.getFixtureList().first().setUserData(this);
         this.body.setGravityScale(0);
     }

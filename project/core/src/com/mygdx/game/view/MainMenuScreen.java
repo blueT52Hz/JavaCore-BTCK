@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.game.MyGdxGame;
-import com.mygdx.game.model.impl.Player.Ninja;
 
 public class MainMenuScreen implements Screen {
     private static final int BACK_BUTTON_WIDTH = 40;
@@ -35,11 +34,9 @@ public class MainMenuScreen implements Screen {
     private static final int SETTINGS_BUTTON_Y = 105;
     private static final int STORE_BUTTON_Y = 30;
     private final MyGdxGame game;
-    public static GameMap gameMap;
     private final Stage stage;
     public MainMenuScreen(MyGdxGame game) {
         this.game = game;
-        gameMap = new GameMap();
         this.stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         createButtons();
@@ -97,7 +94,7 @@ public class MainMenuScreen implements Screen {
         settingsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Xử lý cài đặt
+                game.setScreen(new SettingsScreen(game));
             }
         });
 
@@ -108,7 +105,7 @@ public class MainMenuScreen implements Screen {
         storeButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new StoreArmsScreen(game, (Ninja) gameMap.getLevelManager().getPlayer()));
+                game.setScreen(new StoreArmsScreen(game));
             }
         });
 
