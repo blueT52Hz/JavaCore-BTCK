@@ -17,7 +17,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class HighscoreScreen extends BaseScreen {
+public class HighscoreScreen implements BaseScreen {
+    private static final int BACK_BUTTON_WIDTH = 100;
+    private static final int BACK_BUTTON_HEIGHT = 50;
+    private static final int BACK_BUTTON_Y = 30;
+
+    private MyGdxGame game;
 
     private final MyGdxGame game;
 
@@ -93,6 +98,17 @@ public class HighscoreScreen extends BaseScreen {
             stt++;
         }
 
+        int x = MyGdxGame.WIDTH / 2 - BACK_BUTTON_WIDTH / 2;
+        if (Gdx.input.getX() < x + BACK_BUTTON_WIDTH && Gdx.input.getX() > x && MyGdxGame.HEIGHT - Gdx.input.getY() < BACK_BUTTON_Y + BACK_BUTTON_HEIGHT && MyGdxGame.HEIGHT - Gdx.input.getY() > BACK_BUTTON_Y) {
+            game.batch.draw(backButtonActive, x, BACK_BUTTON_Y, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
+            if (Gdx.input.justTouched()) {
+                this.dispose();
+                game.setScreen(new MainMenuScreen(game));
+            }
+        } else {
+            game.batch.draw(backButtonInActive, x, BACK_BUTTON_Y, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
+        }
+
         game.batch.end();
         stage.act(delta);
         stage.draw();
@@ -101,6 +117,8 @@ public class HighscoreScreen extends BaseScreen {
     @Override
     public void dispose() {
         // Dispose resources
+        headerFont.dispose();
+        playerFont.dispose();
         highscoreTexture.dispose();
     }
 

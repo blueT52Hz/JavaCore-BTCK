@@ -1,7 +1,9 @@
 package com.mygdx.game.model;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.mygdx.game.model.constant.ConstantSound;
 import com.mygdx.game.model.constant.EnemyState;
 import com.mygdx.game.view.Brick;
 

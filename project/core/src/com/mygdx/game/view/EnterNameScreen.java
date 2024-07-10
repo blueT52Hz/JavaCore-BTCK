@@ -1,5 +1,6 @@
 package com.mygdx.game.view;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -8,20 +9,25 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.mygdx.game.MyGdxGame;
 
-public class EnterNameScreen extends BaseScreen {
-    private final TextField nameInput;
-    private final Texture background;
-    private final BitmapFont font;
+public class EnterNameScreen implements Screen {
+    private MyGdxGame game;
+    private Stage stage;
+    private TextField nameInput;
+    private Texture background;
+    private BitmapFont font;
+    private Texture submitButtonActive;
+    private Texture submitButtonInactive;
+
+    private static final int SUBMIT_BUTTON_WIDTH = 110;
+    private static final int SUBMIT_BUTTON_HEIGHT = 50;
+    private static final int SUBMIT_BUTTON_Y = 280;
 
     public EnterNameScreen(MyGdxGame game) {
         super(game);
@@ -46,8 +52,8 @@ public class EnterNameScreen extends BaseScreen {
         textFieldStyle.background = new TextureRegionDrawable(new TextureRegion(whiteTexture));
 
         textFieldStyle.cursor = new TextureRegionDrawable(new Texture(Gdx.files.internal("cursor.png")));
-        textFieldStyle.cursor.setMinWidth(1f); // Độ rộng của con trỏ
-        textFieldStyle.cursor.setMinHeight(20f); // Chiều cao của con trỏ
+        textFieldStyle.cursor.setMinWidth(1f);
+        textFieldStyle.cursor.setMinHeight(20f);
         textFieldStyle.cursor.setLeftWidth(1f);
 
         nameInput = new TextField("", textFieldStyle);
@@ -57,24 +63,8 @@ public class EnterNameScreen extends BaseScreen {
         nameInput.setMaxLength(7);
         stage.addActor(nameInput);
 
-        TextButton.TextButtonStyle buttonStyle = new TextButton.TextButtonStyle();
-        buttonStyle.font = font;
-        TextButton submitButton = new TextButton("Enter", buttonStyle);
-        submitButton.setSize(150, 50);
-        submitButton.setPosition(Gdx.graphics.getWidth() / 2f - 75, Gdx.graphics.getHeight() / 2f - 60);
-        submitButton.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-
-            @Override
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                String playerName = nameInput.getText();
-                if(!playerName.isEmpty()) game.setScreen(new MainGameScreenTest(game, playerName));
-            }
-        });
-        stage.addActor(submitButton);
+        submitButtonActive = new Texture("Button/EnterActive.PNG");
+        submitButtonInactive = new Texture("Button/EnterInactive.PNG");
     }
 
     @Override
@@ -90,6 +80,17 @@ public class EnterNameScreen extends BaseScreen {
         float backgroundX = (float) (Gdx.graphics.getWidth() - 360) / 2;
         float backgroundY = (float) (Gdx.graphics.getHeight() - 200) / 2;
         game.batch.draw(background, backgroundX, backgroundY, 360, 200);
+
+        int x = Gdx.graphics.getWidth() / 2 - SUBMIT_BUTTON_WIDTH / 2;
+        if (Gdx.input.getX() < x + SUBMIT_BUTTON_WIDTH && Gdx.input.getX() > x && Gdx.graphics.getHeight() - Gdx.input.getY() < SUBMIT_BUTTON_Y + SUBMIT_BUTTON_HEIGHT && Gdx.graphics.getHeight() - Gdx.input.getY() > SUBMIT_BUTTON_Y) {
+            game.batch.draw(submitButtonActive, x, SUBMIT_BUTTON_Y, SUBMIT_BUTTON_WIDTH, SUBMIT_BUTTON_HEIGHT);
+            if (Gdx.input.isTouched()) {
+                String playerName = nameInput.getText();
+                game.setScreen(new MainGameScreenTest(game, playerName));
+            }
+        } else {
+            game.batch.draw(submitButtonInactive, x, SUBMIT_BUTTON_Y, SUBMIT_BUTTON_WIDTH, SUBMIT_BUTTON_HEIGHT);
+        }
         game.batch.end();
 
         stage.act(delta);

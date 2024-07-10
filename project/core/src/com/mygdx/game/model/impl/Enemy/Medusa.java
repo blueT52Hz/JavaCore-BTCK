@@ -1,14 +1,17 @@
 package com.mygdx.game.model.impl.Enemy;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.controller.AudioManager;
 import com.mygdx.game.controller.BoxManager;
 import com.mygdx.game.model.Coin;
 import com.mygdx.game.model.EnemyBullet;
 import com.mygdx.game.model.Player;
+import com.mygdx.game.model.constant.ConstantSound;
 import com.mygdx.game.model.constant.EnemyState;
 import com.mygdx.game.model.impl.Bullet.Flame;
 import com.mygdx.game.view.Brick;
@@ -21,6 +24,8 @@ import java.util.ArrayList;
 import static com.mygdx.game.model.constant.Constants.PPM;
 
 public class Medusa extends Enemy {
+    private AudioManager audioManager;
+    private Sound fireballShootSound;
     private long lastTimeAttack;
     public Medusa(float x, float y, int level, Brick brick, Player target) {
         super(level, brick, target);
@@ -39,6 +44,10 @@ public class Medusa extends Enemy {
         this.speed = 10 + this.brick.getxSpeed();
         createBody();
         System.out.println("xPos = " + body.getPosition().x*PPM + " yPos = " + body.getPosition().y*PPM);
+
+        this.audioManager = AudioManager.getInstance();
+        this.fireballShootSound = ConstantSound.fireballShootSound;
+
     }
 
     @Override
@@ -80,6 +89,7 @@ public class Medusa extends Enemy {
                 if(attackImg==null || this.stateTime >= 70 * Gdx.graphics.getDeltaTime()) {
                     this.stateTime = 0;
                     spawnEnemyBullet();
+
                     this.enemyState = EnemyState.MOVE;
                 }
                 if(this.speed>0) spriteBatch.draw(attackImg, x, y, this.width, this.height);
@@ -124,6 +134,7 @@ public class Medusa extends Enemy {
     public void spawnEnemyBullet() {
         lastTimeAttack = TimeUtils.millis();
         if(!target.isAppear()) return;
+        audioManager.playSound(fireballShootSound);
         Flame flame = new Flame(x+width/2, y+height/2, this);
         flame.updateRotation(target.getX(), target.getY());
         enemyBullets.add(flame);
