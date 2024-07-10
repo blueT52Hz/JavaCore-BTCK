@@ -1,0 +1,20 @@
+[
+    {
+      "name": "ninja",
+      "price": 0,
+      "unlocked": true,
+      "width": 50,
+      "height": 50,
+      "equipped": true
+  
+    },
+    {
+      "name": "ninjagirl",
+      "price": 0,
+      "unlocked": false,
+      "width": 50,
+      "height": 50,
+      "equipped": false
+    }
+  ]
+  

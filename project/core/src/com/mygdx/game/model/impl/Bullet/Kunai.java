@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.mygdx.game.controller.BoxManager;
-import com.mygdx.game.model.Bullet;
 import com.mygdx.game.model.PlayerBullet;
+import com.mygdx.game.model.StatusSkinAndArm;
 import com.mygdx.game.view.GameMap;
 
 import static com.mygdx.game.model.constant.Constants.PPM;
@@ -13,7 +13,7 @@ import static com.mygdx.game.model.constant.Constants.PPM;
 public class Kunai extends PlayerBullet {
 
     public Kunai(float x, float y) {
-        super(new Texture("Kunai.png"));
+        super(new Texture("Bullet/" + StatusSkinAndArm.armState + ".png"));
         this.width=40;
         this.height=8;
 

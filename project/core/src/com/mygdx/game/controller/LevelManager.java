@@ -1,14 +1,12 @@
 package com.mygdx.game.controller;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.model.*;
-import com.mygdx.game.model.impl.Enemy.Demon;
 import com.mygdx.game.model.impl.Enemy.Medusa;
 import com.mygdx.game.model.impl.Player.Ninja;
 import com.mygdx.game.view.Brick;
@@ -26,16 +24,16 @@ public class LevelManager {
     private boolean isGoToNextLevel, isGoToPreLevel;
     public ArrayList<ArrayList<Brick>> bricks;
     public ArrayList<ArrayList<Enemy>> enemies;
-    private ArrayList<ArrayList<Coin>> coins;
-    private Player player;
-    private Texture startMapImage = new Texture("tiles/mapStart.png");
-    private Texture mapImage = new Texture("tiles/map.png");
+    private final ArrayList<ArrayList<Coin>> coins;
+    public Ninja player;
+    private final Texture startMapImage = new Texture("tiles/mapStart.png");
+    private final Texture mapImage = new Texture("tiles/map.png");
     public LevelManager(){
         bricks = new ArrayList<>();
         enemies = new ArrayList<>();
         coins = new ArrayList<>();
-        coins.add(new ArrayList<Coin>());
-        player = new Ninja();
+        coins.add(new ArrayList<>());
+        player = MyGdxGame.ninja;
         currentLevel = 0;
         maxLevel = 0;
         isGoToNextLevel = false;

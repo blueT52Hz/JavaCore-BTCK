@@ -1,10 +1,6 @@
 package com.mygdx.game.model;
-
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.mygdx.game.model.constant.PlayerState;
-
-import static com.mygdx.game.model.constant.Constants.PPM;
 
 public abstract class Player extends Entity {
     protected float xSpeed;

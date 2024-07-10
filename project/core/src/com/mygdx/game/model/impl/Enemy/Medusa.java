@@ -162,7 +162,7 @@ public class Medusa extends Enemy {
         this.moveRightAnimation = new Animation<>(0.05f, moveRightImgs);
         this.moveLeftAnimation = new Animation<>(0.05f, moveLeftImgs);
         this.deathRightAnimation = new Animation<>(0.2f, deathRightImgs);
-        this.deathLeftAnimation = new Animation(0.2f, deathLeftImgs);
+        this.deathLeftAnimation = new Animation<>(0.2f, deathLeftImgs);
         this.attackRightAnimation = new Animation<>(0.2f, attackRightImgs);
         this.attackLeftAnimation = new Animation<>(0.2f, attackLeftImgs);
     }

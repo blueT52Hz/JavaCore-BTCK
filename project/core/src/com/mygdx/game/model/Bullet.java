@@ -17,7 +17,7 @@ public abstract class Bullet extends Sprite {
     protected int height;
     public Body body;
     protected boolean appear;
-    protected boolean canBounce=false;
+    protected boolean canBounce = false;
     protected boolean handledContact;
     public Bullet(Texture texture) {
         super(texture);
@@ -58,6 +58,9 @@ public abstract class Bullet extends Sprite {
 
     public Body getBody() {
         return body;
+    }
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     @Override

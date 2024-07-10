@@ -6,14 +6,10 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.World;
-import com.mygdx.game.controller.CoinCounter;
 import com.mygdx.game.controller.LevelManager;
 import com.mygdx.game.model.Coin;
 import com.mygdx.game.model.Enemy;
 import com.mygdx.game.model.PlayerScore;
-
-import java.util.ArrayList;
-
 
 public class GameMap extends Matrix4 {
     public static World world = new World(new Vector2(0, -2f), false);

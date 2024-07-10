@@ -17,26 +17,25 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class HighscoreScreen implements Screen {
+public class HighscoreScreen implements BaseScreen {
     private static final int BACK_BUTTON_WIDTH = 100;
     private static final int BACK_BUTTON_HEIGHT = 50;
     private static final int BACK_BUTTON_Y = 30;
 
     private MyGdxGame game;
 
-    private Texture backButtonActive;
-    private Texture backButtonInActive;
+    private final MyGdxGame game;
 
-    private Texture highscoreTexture;
-    private Texture tablehighscoreTexture;
+    private final Texture highscoreTexture;
+    private final Texture tablehighscoreTexture;
 
     // Khai báo font cho dòng tiêu đề và player
-    private BitmapFont headerFont;
-    private BitmapFont playerFont;
+    private final BitmapFont headerFont;
+    private final BitmapFont playerFont;
 
     public HighscoreScreen(MyGdxGame game) {
+        super(game);
         this.game = game;
-
         // Generate BitmapFont from OTF file
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("MinecraftRegular-Bmg3.otf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
@@ -54,14 +53,12 @@ public class HighscoreScreen implements Screen {
         generator.dispose(); // Don't forget to dispose to avoid memory leaks
 
         highscoreTexture = new Texture("Button/HighscoreActive.PNG");
-        backButtonActive = new Texture("Button/BackActive.PNG");
-        backButtonInActive = new Texture("Button/BackInactive.PNG");
         tablehighscoreTexture = new Texture("Button/TableHighscore.PNG");
     }
 
     @Override
-    public void show() {
-        // Initialize resources in show method
+    protected void onBackButtonPressed() {
+        game.setScreen(new MainMenuScreen(game));
     }
 
     @Override
@@ -71,14 +68,14 @@ public class HighscoreScreen implements Screen {
 
         game.batch.begin();
         // Draw the highscore image
-        game.batch.draw(highscoreTexture, MyGdxGame.WIDTH / 2 - 120, 550, 240, 60);
-        game.batch.draw(tablehighscoreTexture, MyGdxGame.WIDTH / 2 - 180, 150, 360, 370);
+        game.batch.draw(highscoreTexture, (float) MyGdxGame.WIDTH / 2 - 120, 550, 240, 60);
+        game.batch.draw(tablehighscoreTexture, (float) MyGdxGame.WIDTH / 2 - 180, 150, 360, 370);
 
         // Load high scores from file
         List<PlayerScore> playerScores = loadHighScores();
 
         // Sort high scores by score (descending)
-        Collections.sort(playerScores, Comparator.comparingInt(PlayerScore::getScore).reversed());
+        playerScores.sort(Comparator.comparingInt(PlayerScore::getScore).reversed());
         int y = 490;
         // Set font color for headers
         headerFont.setColor(Color.YELLOW);
@@ -111,25 +108,11 @@ public class HighscoreScreen implements Screen {
         } else {
             game.batch.draw(backButtonInActive, x, BACK_BUTTON_Y, BACK_BUTTON_WIDTH, BACK_BUTTON_HEIGHT);
         }
+
         game.batch.end();
+        stage.act(delta);
+        stage.draw();
     }
-
-    @Override
-    public void resize(int width, int height) {
-    }
-
-    @Override
-    public void pause() {
-    }
-
-    @Override
-    public void resume() {
-    }
-
-    @Override
-    public void hide() {
-        // Dispose resources when screen is hidden
-}
 
     @Override
     public void dispose() {
@@ -137,8 +120,6 @@ public class HighscoreScreen implements Screen {
         headerFont.dispose();
         playerFont.dispose();
         highscoreTexture.dispose();
-        backButtonActive.dispose();
-        backButtonInActive.dispose();
     }
 
     private List<PlayerScore> loadHighScores() {
@@ -161,9 +142,9 @@ public class HighscoreScreen implements Screen {
     }
 
     private static class PlayerScore {
-        private String name;
-        private int level;
-        private int score;
+        private final String name;
+        private final int level;
+        private final int score;
 
         public PlayerScore(String name, int level, int score) {
             this.name = name;

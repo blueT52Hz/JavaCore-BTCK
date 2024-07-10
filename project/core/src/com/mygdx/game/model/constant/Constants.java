@@ -2,7 +2,6 @@ package com.mygdx.game.model.constant;
 
 public class Constants {
     public static final float PPM = 32;
-
     static public final String BOSS_FIGHT_BGM_PATH      = "Audio/Music/BossFightBGM.wav";
     static public final String DEFEATED_BGM_PATH        = "Audio/Music/DefeatedBGM.mp3";
     static public final String MAIN_BGM_PATH            = "Audio/Music/MainBGM.wav";
